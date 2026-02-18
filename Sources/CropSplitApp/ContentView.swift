@@ -1,5 +1,6 @@
 import SwiftUI
 import AppKit
+import UniformTypeIdentifiers
 
 // 메인 뷰: 이미지 로드, 크롭 크기 입력, 프리셋 선택, 분할 설정과 미리보기 영역을 포함합니다.
 struct ContentView: View {
@@ -132,7 +133,11 @@ struct ContentView: View {
     // 파일 열기 패널을 띄워 이미지를 선택하고 로드합니다.
     private func loadImage() {
         let panel = NSOpenPanel()
-        panel.allowedFileTypes = ["png", "jpg", "jpeg", "heic", "tiff"]
+        if #available(macOS 12.0, *) {
+            panel.allowedContentTypes = [.png, .jpeg, .heic, .tiff]
+        } else {
+            panel.allowedFileTypes = ["png", "jpg", "jpeg", "heic", "tiff"]
+        }
         panel.allowsMultipleSelection = false
         panel.canChooseDirectories = false
         if panel.runModal() == .OK, let url = panel.url, let img = NSImage(contentsOf: url) {
