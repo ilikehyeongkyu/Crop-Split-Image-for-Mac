@@ -70,8 +70,8 @@ struct ControlsView: View {
 
                     Picker("Presets:", selection: selectionBinding) {
                         Text("None").tag(Optional<Int>.none)
-                        ForEach(Array(presets.enumerated()), id: \.
-                            element) { (idx, p) in
+                        ForEach(presets.indices, id: \.self) { idx in
+                            let p = presets[idx]
                             Text(p.name).tag(Optional(idx))
                         }
                     }
