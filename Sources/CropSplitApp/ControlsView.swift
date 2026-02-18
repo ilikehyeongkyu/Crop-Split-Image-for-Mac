@@ -53,11 +53,12 @@ struct ControlsView: View {
 
             HStack(spacing: 12) {
                 HStack(spacing: 6) {
-                    // Picker selection을 Preset 전체 대신 Preset.id(UUID)로 처리하여 태깅/비교 문제를 피합니다.
-                    let selectionBinding = Binding<UUID?>(
-                        get: { selectedPreset?.id },
-                        set: { newId in
-                            if let id = newId, let p = presets.first(where: { $0.id == id }) {
+                    // Picker selection을 배열 인덱스(Int)로 처리하여 태그/비교 문제를 방지합니다.
+                    let selectionBinding = Binding<Int?>(
+                        get: { selectedPreset.flatMap { p in presets.firstIndex(where: { $0.id == p.id }) } },
+                        set: { newIndex in
+                            if let idx = newIndex, presets.indices.contains(idx) {
+                                let p = presets[idx]
                                 selectedPreset = p
                                 lockAspect = true
                                 applyPreset(p)
@@ -68,9 +69,10 @@ struct ControlsView: View {
                     )
 
                     Picker("Presets:", selection: selectionBinding) {
-                        Text("None").tag(Optional<UUID>.none)
-                        ForEach(presets) { p in
-                            Text(p.name).tag(Optional(p.id))
+                        Text("None").tag(Optional<Int>.none)
+                        ForEach(Array(presets.enumerated()), id: \.
+                            element) { (idx, p) in
+                            Text(p.name).tag(Optional(idx))
                         }
                     }
                     .pickerStyle(.menu)
