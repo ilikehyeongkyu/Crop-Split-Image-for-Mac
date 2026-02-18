@@ -24,10 +24,10 @@ struct ContentView: View {
 
     let presets: [Preset] = [
         Preset(name: "Instagram Vertical (4:5)", ratio: CGSize(width: 4, height: 5)),
-        Preset(name: "Square (1:1)", ratio: CGSize(width: 1, height: 1)),
-        Preset(name: "Two Across (8:5)", ratio: CGSize(width: 8, height: 5)),
-        Preset(name: "Three Across (12:5)", ratio: CGSize(width: 12, height: 5)),
-        Preset(name: "Four Across (16:5)", ratio: CGSize(width: 16, height: 5))
+        Preset(name: "Instagram Square (1:1)", ratio: CGSize(width: 1, height: 1)),
+        Preset(name: "Instagram Two Across (8:5)", ratio: CGSize(width: 8, height: 5)),
+        Preset(name: "Instagram Three Across (12:5)", ratio: CGSize(width: 12, height: 5)),
+        Preset(name: "Instagram Four Across (16:5)", ratio: CGSize(width: 16, height: 5))
     ]
 
     var body: some View {
@@ -120,13 +120,13 @@ struct ContentView: View {
                                     }
                                 )
                             )
-                            .onDrop(of: ["public.file-url"], isTargeted: nil) { providers in
-                                handleDrop(providers: providers)
-                            }
                     } else {
                         Text("Load an image.")
                             .foregroundColor(.secondary)
                     }
+                }
+                .onDrop(of: ["public.file-url"], isTargeted: nil) { providers in
+                    handleDrop(providers: providers)
                 }
             }
         }
