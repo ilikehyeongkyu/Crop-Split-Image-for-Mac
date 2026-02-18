@@ -96,9 +96,40 @@ struct ControlsView: View {
 #if DEBUG
 struct ControlsView_Previews: PreviewProvider {
     static var previews: some View {
-        ControlsView(presets: [
-            Preset(name: "Instagram Vertical (4:5)", ratio: CGSize(width: 4, height: 5), cols: 1, rows: 1)
-        ], cropWidthText: .constant("800"), cropHeightText: .constant("600"), lockAspect: .constant(false), selectedPreset: .constant(nil), cols: .constant(1), rows: .constant(1), imageSize: CGSize(width: 800, height: 600), loadImage: {}, applyPreset: { _ in }, cropAndSave: {})
+        PreviewWrapper()
+            .previewLayout(.sizeThatFits)
+    }
+
+    struct PreviewWrapper: View {
+        @State private var cropWidthText = "800"
+        @State private var cropHeightText = "600"
+        @State private var lockAspect = false
+        @State private var selectedPreset: Preset? = nil
+        @State private var cols = 2
+        @State private var rows = 1
+
+        let presets: [Preset] = [
+            Preset(name: "Square 1:1", ratio: CGSize(width: 1, height: 1), cols: 1, rows: 1),
+            Preset(name: "Instagram 4:5", ratio: CGSize(width: 4, height: 5), cols: 1, rows: 1),
+            Preset(name: "Two Across", ratio: CGSize(width: 2, height: 1), cols: 2, rows: 1)
+        ]
+
+        var body: some View {
+            ControlsView(
+                cropWidthText: $cropWidthText,
+                cropHeightText: $cropHeightText,
+                lockAspect: $lockAspect,
+                selectedPreset: $selectedPreset,
+                cols: $cols,
+                rows: $rows,
+                imageSize: CGSize(width: 1920, height: 1080),
+                loadImage: {},
+                applyPreset: { _ in },
+                cropAndSave: {},
+                presets: presets
+            )
+            .frame(width: 900)
+        }
     }
 }
 #endif

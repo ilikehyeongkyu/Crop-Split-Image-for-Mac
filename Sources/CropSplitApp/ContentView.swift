@@ -29,7 +29,7 @@ struct ContentView: View {
 
     var body: some View {
         VStack(alignment: .leading) {
-            ControlsView(presets: presets, cropWidthText: $cropWidthText, cropHeightText: $cropHeightText, lockAspect: $lockAspect, selectedPreset: $selectedPreset, cols: $cols, rows: $rows, imageSize: imageSize, loadImage: loadImage, applyPreset: applyPreset, cropAndSave: cropAndSave)
+            ControlsView(cropWidthText: $cropWidthText, cropHeightText: $cropHeightText, lockAspect: $lockAspect, selectedPreset: $selectedPreset, cols: $cols, rows: $rows, imageSize: imageSize, loadImage: loadImage, applyPreset: applyPreset, cropAndSave: cropAndSave, presets: presets)
 
             Divider()
 
