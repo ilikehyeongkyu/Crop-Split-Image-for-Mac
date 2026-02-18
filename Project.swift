@@ -9,7 +9,7 @@ let project = Project(
             destinations: .macOS,
             product: Product.app,
             bundleId: "com.hyeongkyu.CropSplitImageApp",
-            infoPlist: InfoPlist.default,
+            infoPlist: .file(path: "Resources/Info.plist"),
             sources: ["Sources/CropSplitApp/**"],
             resources: ["Resources/**"]
         )
