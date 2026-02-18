@@ -1,5 +1,6 @@
 import SwiftUI
 
+// 선택 오버레이: 이미지 위에 크롭 영역을 표시하고 이동/리사이즈 동작을 처리합니다.
 struct SelectionOverlay: View {
     let imageSize: CGSize
     let dispOrigin: CGPoint
@@ -98,7 +99,7 @@ struct SelectionOverlay: View {
         }
     }
 
-    // small circular handle view
+    // 모서리 핸들 뷰: 드래그로 크롭 박스 크기를 조정하는 원형 핸들입니다.
     @ViewBuilder
     private func handleView(at point: CGPoint) -> some View {
         Circle()
@@ -108,8 +109,10 @@ struct SelectionOverlay: View {
             .position(x: point.x, y: point.y)
     }
 
+    // 크기 조정 시 사용할 코너 열거형
     private enum Corner { case topLeft, topRight, bottomLeft, bottomRight }
 
+    // 특정 코너를 드래그할 때의 리사이즈 제스처를 반환합니다.
     private func resizeGesture(corner: Corner, scale: CGFloat, currentSize: CGSize) -> some Gesture {
         DragGesture(minimumDistance: 0)
             .onChanged { v in

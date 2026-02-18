@@ -1,6 +1,7 @@
 import SwiftUI
 import AppKit
 
+// 프리셋 모델: 크롭 비율과 기본 분할(cols, rows)을 함께 보관합니다.
 struct Preset: Identifiable, Hashable {
     let id = UUID()
     let name: String
@@ -9,6 +10,7 @@ struct Preset: Identifiable, Hashable {
     let rows: Int
 }
 
+// 상단 컨트롤 뷰: 이미지 로드, 크롭 사이즈 입력, 프리셋 선택, 분할 설정 및 저장 버튼을 포함합니다.
 struct ControlsView: View {
     @Binding var cropWidthText: String
     @Binding var cropHeightText: String
@@ -85,6 +87,7 @@ struct ControlsView: View {
     }
 }
 
+// Preview용 더미 뷰입니다.
 #if DEBUG
 struct ControlsView_Previews: PreviewProvider {
     static var previews: some View {

@@ -1,6 +1,7 @@
 import SwiftUI
 import AppKit
 
+// 메인 뷰: 이미지 로드, 크롭 크기 입력, 프리셋 선택, 분할 설정과 미리보기 영역을 포함합니다.
 struct ContentView: View {
     @State private var nsImage: NSImage? = nil
     @State private var imageSize: CGSize = .zero
@@ -90,6 +91,7 @@ struct ContentView: View {
         }
     }
 
+    // 프리셋을 적용하여 크롭 비율과 분할(cols/rows)을 설정합니다.
     private func applyPreset(_ p: Preset) {
         if imageSize.width > 0 {
             let w = imageSize.width
@@ -104,6 +106,7 @@ struct ContentView: View {
         }
     }
 
+    // 현재 입력값과 잠금(비율)을 고려해 이미지 픽셀 단위의 크롭 사이즈를 계산합니다.
     private func computedCropSizeInImagePixels() -> CGSize {
         var cw = CGFloat(Int(cropWidthText) ?? 0)
         var ch = CGFloat(Int(cropHeightText) ?? 0)
@@ -126,6 +129,7 @@ struct ContentView: View {
         return CGSize(width: max(1, min(cw, imageSize.width)), height: max(1, min(ch, imageSize.height)))
     }
 
+    // 파일 열기 패널을 띄워 이미지를 선택하고 로드합니다.
     private func loadImage() {
         let panel = NSOpenPanel()
         panel.allowedFileTypes = ["png", "jpg", "jpeg", "heic", "tiff"]
@@ -137,6 +141,7 @@ struct ContentView: View {
         }
     }
 
+    // 드래그 앤 드롭으로 전달된 파일 URL을 처리하여 이미지를 로드합니다.
     private func handleDrop(providers: [NSItemProvider]) -> Bool {
         for provider in providers {
             if provider.hasItemConformingToTypeIdentifier("public.file-url") {
@@ -162,6 +167,7 @@ struct ContentView: View {
         return false
     }
 
+    // 현재 선택 영역을 기준으로 크롭 및 분할한 이미지를 선택한 디렉터리에 저장합니다.
     private func cropAndSave() {
         guard let img = nsImage else { return }
         let cropSize = computedCropSizeInImagePixels()
@@ -195,198 +201,7 @@ struct ContentView: View {
     }
 }
 
-struct SelectionOverlay: View {
-    let imageSize: CGSize
-    let dispOrigin: CGPoint
-    let dispSize: CGSize
-    @Binding var selectionCenter: CGPoint
-    @Binding var selectionSize: CGSize
-    @Binding var lockAspect: Bool
-    let cols: Int
-    let rows: Int
-    var cropSizeProvider: () -> CGSize
-    var onChange: ((CGSize, CGPoint) -> Void)? = nil
 
-    @State private var dragStartCenter: CGPoint = .zero
-    @State private var dragStartSize: CGSize = .zero
-    @State private var isDragging: Bool = false
-
-    let handleSize: CGFloat = 10
-
-    var body: some View {
-        GeometryReader { _ in
-            // use current interactive selectionSize if available, otherwise provider fallback
-            let cropSize = (selectionSize.width > 0 && selectionSize.height > 0) ? selectionSize : cropSizeProvider()
-            let scale = dispSize.width / imageSize.width
-            let selDispSize = CGSize(width: cropSize.width * scale, height: cropSize.height * scale)
-            let selCenterDisp = CGPoint(x: dispOrigin.x + (selectionCenter.x * scale), y: dispOrigin.y + ((imageSize.height - selectionCenter.y) * scale))
-
-            // Main selection rectangle
-            ZStack {
-                Rectangle()
-                    .stroke(Color.red, lineWidth: 2)
-                    .frame(width: selDispSize.width, height: selDispSize.height)
-                    .position(x: selCenterDisp.x, y: selCenterDisp.y)
-                    .contentShape(Rectangle())
-
-                // Dashed grid showing splits inside selection (drawn in a frame matching the selection)
-                ZStack {
-                    if cols > 1 {
-                        ForEach(1..<(cols), id: \.self) { i in
-                            Path { p in
-                                let x = CGFloat(i) * selDispSize.width / CGFloat(cols)
-                                p.move(to: CGPoint(x: x, y: 0))
-                                p.addLine(to: CGPoint(x: x, y: selDispSize.height))
-                            }
-                            .stroke(Color.white.opacity(0.85), style: StrokeStyle(lineWidth: 1, dash: [6,4]))
-                        }
-                    }
-                    if rows > 1 {
-                        ForEach(1..<(rows), id: \.self) { j in
-                            Path { p in
-                                let y = CGFloat(j) * selDispSize.height / CGFloat(rows)
-                                p.move(to: CGPoint(x: 0, y: y))
-                                p.addLine(to: CGPoint(x: selDispSize.width, y: y))
-                            }
-                            .stroke(Color.white.opacity(0.85), style: StrokeStyle(lineWidth: 1, dash: [6,4]))
-                        }
-                    }
-                }
-                .frame(width: selDispSize.width, height: selDispSize.height)
-                .position(x: selCenterDisp.x, y: selCenterDisp.y)
-            }
-                .gesture(
-                    DragGesture(minimumDistance: 0)
-                        .onChanged { v in
-                            if !isDragging {
-                                dragStartCenter = selectionCenter
-                                isDragging = true
-                            }
-                            let dx = v.translation.width / scale
-                            let dy = -v.translation.height / scale
-                            var newCenter = CGPoint(x: dragStartCenter.x + dx, y: dragStartCenter.y + dy)
-                            // clamp within image using current cropSize
-                            newCenter.x = max(cropSize.width/2, min(newCenter.x, imageSize.width - cropSize.width/2))
-                            newCenter.y = max(cropSize.height/2, min(newCenter.y, imageSize.height - cropSize.height/2))
-                            selectionCenter = newCenter
-                            onChange?(cropSize, newCenter)
-                        }
-                        .onEnded { _ in
-                            isDragging = false
-                        }
-                )
-
-            // Corner handles: top-left, top-right, bottom-left, bottom-right
-            Group {
-                handleView(at: CGPoint(x: selCenterDisp.x - selDispSize.width/2, y: selCenterDisp.y - selDispSize.height/2)) // top-left
-                    .gesture(resizeGesture(corner: .topLeft, scale: scale, currentSize: cropSize))
-
-                handleView(at: CGPoint(x: selCenterDisp.x + selDispSize.width/2, y: selCenterDisp.y - selDispSize.height/2)) // top-right
-                    .gesture(resizeGesture(corner: .topRight, scale: scale, currentSize: cropSize))
-
-                handleView(at: CGPoint(x: selCenterDisp.x - selDispSize.width/2, y: selCenterDisp.y + selDispSize.height/2)) // bottom-left
-                    .gesture(resizeGesture(corner: .bottomLeft, scale: scale, currentSize: cropSize))
-
-                handleView(at: CGPoint(x: selCenterDisp.x + selDispSize.width/2, y: selCenterDisp.y + selDispSize.height/2)) // bottom-right
-                    .gesture(resizeGesture(corner: .bottomRight, scale: scale, currentSize: cropSize))
-            }
-        }
-    }
-
-    // small circular handle view
-    @ViewBuilder
-    private func handleView(at point: CGPoint) -> some View {
-        Circle()
-            .fill(Color.white)
-            .overlay(Circle().stroke(Color.red, lineWidth: 1))
-            .frame(width: handleSize, height: handleSize)
-            .position(x: point.x, y: point.y)
-    }
-
-    private enum Corner { case topLeft, topRight, bottomLeft, bottomRight }
-
-    private func resizeGesture(corner: Corner, scale: CGFloat, currentSize: CGSize) -> some Gesture {
-        DragGesture(minimumDistance: 0)
-            .onChanged { v in
-                if !isDragging {
-                    dragStartCenter = selectionCenter
-                    dragStartSize = currentSize
-                    isDragging = true
-                }
-                let deltaX = v.translation.width / scale
-                let deltaY = -v.translation.height / scale
-
-                // compute box corners in image coords
-                let halfW = dragStartSize.width / 2
-                let halfH = dragStartSize.height / 2
-                let left = dragStartCenter.x - halfW
-                let right = dragStartCenter.x + halfW
-                let top = dragStartCenter.y + halfH
-                let bottom = dragStartCenter.y - halfH
-
-                var newLeft = left
-                var newRight = right
-                var newTop = top
-                var newBottom = bottom
-
-                switch corner {
-                case .topLeft:
-                    newLeft = left + deltaX
-                    newTop = top + deltaY
-                case .topRight:
-                    newRight = right + deltaX
-                    newTop = top + deltaY
-                case .bottomLeft:
-                    newLeft = left + deltaX
-                    newBottom = bottom + deltaY
-                case .bottomRight:
-                    newRight = right + deltaX
-                    newBottom = bottom + deltaY
-                }
-
-                // ensure min size
-                var newW = max(1, newRight - newLeft)
-                var newH = max(1, newTop - newBottom)
-
-                // apply lock aspect if needed
-                if lockAspect {
-                    // determine desired ratio
-                    let ratio = (selectionSize.width > 0 && selectionSize.height > 0) ? (selectionSize.width / selectionSize.height) : (dragStartSize.width / dragStartSize.height)
-                    if newW / newH > ratio {
-                        newW = newH * ratio
-                    } else {
-                        newH = newW / ratio
-                    }
-                    // adjust left/right/top/bottom to match new sizes while anchoring opposite corner
-                    let centerX = (newLeft + newRight) / 2
-                    let centerY = (newTop + newBottom) / 2
-                    newLeft = centerX - newW/2
-                    newRight = centerX + newW/2
-                    newTop = centerY + newH/2
-                    newBottom = centerY - newH/2
-                }
-
-                // clamp within image bounds
-                newLeft = max(0, newLeft)
-                newRight = min(imageSize.width, newRight)
-                newTop = min(imageSize.height, newTop)
-                newBottom = max(0, newBottom)
-
-                newW = max(1, newRight - newLeft)
-                newH = max(1, newTop - newBottom)
-
-                let newCenter = CGPoint(x: (newLeft + newRight)/2, y: (newTop + newBottom)/2)
-                let newSize = CGSize(width: newW, height: newH)
-
-                selectionCenter = newCenter
-                selectionSize = newSize
-                onChange?(newSize, newCenter)
-            }
-            .onEnded { _ in
-                isDragging = false
-            }
-    }
-}
 
 #if DEBUG
 struct ContentView_Previews: PreviewProvider {
