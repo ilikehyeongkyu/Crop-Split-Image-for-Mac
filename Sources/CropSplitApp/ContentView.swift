@@ -5,6 +5,8 @@ struct Preset: Identifiable, Hashable {
     let id = UUID()
     let name: String
     let ratio: CGSize
+    let cols: Int
+    let rows: Int
 }
 
 struct ContentView: View {
@@ -24,11 +26,11 @@ struct ContentView: View {
     @State private var selectionSize: CGSize = .zero // image-pixel size for interactive resize
 
     let presets: [Preset] = [
-        Preset(name: "Instagram Vertical (4:5)", ratio: CGSize(width: 4, height: 5)),
-        Preset(name: "Instagram Square (1:1)", ratio: CGSize(width: 1, height: 1)),
-        Preset(name: "Instagram Two Across (8:5)", ratio: CGSize(width: 8, height: 5)),
-        Preset(name: "Instagram Three Across (12:5)", ratio: CGSize(width: 12, height: 5)),
-        Preset(name: "Instagram Four Across (16:5)", ratio: CGSize(width: 16, height: 5))
+        Preset(name: "Instagram Vertical (4:5)", ratio: CGSize(width: 4, height: 5), cols: 1, rows: 1),
+        Preset(name: "Instagram Square (1:1)", ratio: CGSize(width: 1, height: 1), cols: 1, rows: 1),
+        Preset(name: "Instagram Two Across (8:5)", ratio: CGSize(width: 8, height: 5), cols: 2, rows: 1),
+        Preset(name: "Instagram Three Across (12:5)", ratio: CGSize(width: 12, height: 5), cols: 3, rows: 1),
+        Preset(name: "Instagram Four Across (16:5)", ratio: CGSize(width: 16, height: 5), cols: 4, rows: 1)
     ]
 
     var body: some View {
@@ -160,6 +162,9 @@ struct ContentView: View {
             let desiredHeight = desiredWidth * (ratio.height / ratio.width)
             cropWidthText = "\(Int(desiredWidth))"
             cropHeightText = "\(Int(desiredHeight))"
+            // apply split from preset
+            cols = p.cols
+            rows = p.rows
         }
     }
 
