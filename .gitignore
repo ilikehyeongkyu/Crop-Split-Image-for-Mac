@@ -8,6 +8,9 @@ xcuserdata/
 DerivedData/
 Derived/
 build/
+dist/
+*.zip
+*.app
 
 # Tuist
 .tuist-generated/
