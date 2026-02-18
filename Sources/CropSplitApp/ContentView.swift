@@ -10,6 +10,7 @@ struct Preset: Identifiable, Hashable {
 struct ContentView: View {
     @State private var nsImage: NSImage? = nil
     @State private var imageSize: CGSize = .zero
+    @State private var imageURL: URL? = nil
 
     @State private var cropWidthText: String = ""
     @State private var cropHeightText: String = ""
@@ -191,6 +192,7 @@ struct ContentView: View {
         panel.canChooseDirectories = false
         if panel.runModal() == .OK, let url = panel.url, let img = NSImage(contentsOf: url) {
             nsImage = img
+            imageURL = url
         }
     }
 
@@ -198,18 +200,20 @@ struct ContentView: View {
         for provider in providers {
             if provider.hasItemConformingToTypeIdentifier("public.file-url") {
                 provider.loadItem(forTypeIdentifier: "public.file-url", options: nil) { item, error in
-                    if let data = item as? Data, let str = String(data: data, encoding: .utf8) {
-                        // data is a file URL string like file:///...
-                        if let url = URL(string: str), let img = NSImage(contentsOf: url) {
+                        if let data = item as? Data, let str = String(data: data, encoding: .utf8) {
+                            // data is a file URL string like file:///...
+                            if let url = URL(string: str), let img = NSImage(contentsOf: url) {
+                                DispatchQueue.main.async {
+                                    self.nsImage = img
+                                    self.imageURL = url
+                                }
+                            }
+                        } else if let url = item as? URL, let img = NSImage(contentsOf: url) {
                             DispatchQueue.main.async {
                                 self.nsImage = img
+                                self.imageURL = url
                             }
                         }
-                    } else if let url = item as? URL, let img = NSImage(contentsOf: url) {
-                        DispatchQueue.main.async {
-                            self.nsImage = img
-                        }
-                    }
                 }
                 return true
             }
@@ -235,7 +239,12 @@ struct ContentView: View {
         panel.prompt = "Select"
         if panel.runModal() == .OK, let dir = panel.url {
             do {
-                let base = "crop"
+                let base: String
+                if let u = imageURL {
+                    base = "\(u.deletingPathExtension().lastPathComponent)_crop"
+                } else {
+                    base = "crop"
+                }
                 let saved = try ImageProcessor.cropAndSplitAndSave(image: img, cropRectInImagePixels: cropRect, cols: max(1, cols), rows: max(1, rows), directory: dir, baseName: base)
                 print("Saved: \(saved)")
             } catch {
