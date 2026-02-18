@@ -70,7 +70,7 @@ struct ContentView: View {
                 }
             }
         }
-        .onChange(of: nsImage) { new in
+        .onChange(of: nsImage) { _, new in
             if let im = new {
                 imageSize = im.size
                 selectionCenter = CGPoint(x: im.size.width/2, y: im.size.height/2)
@@ -83,10 +83,10 @@ struct ContentView: View {
                 imageSize = .zero
             }
         }
-        .onChange(of: cropWidthText) { _ in
+        .onChange(of: cropWidthText) { _, _ in
             selectionSize = computedCropSizeInImagePixels()
         }
-        .onChange(of: cropHeightText) { _ in
+        .onChange(of: cropHeightText) { _, _ in
             selectionSize = computedCropSizeInImagePixels()
         }
     }
