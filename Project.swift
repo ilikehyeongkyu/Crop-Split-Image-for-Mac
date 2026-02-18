@@ -11,7 +11,7 @@ let project = Project(
             bundleId: "com.hyeongkyu.CropSplitImageApp",
             infoPlist: InfoPlist.default,
             sources: ["Sources/CropSplitApp/**"],
-            resources: []
+            resources: ["Resources/**"]
         )
     ]
 )

@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Simple original SVG app icon for Crop & Split Image
+  - 1024x1024 viewBox
+  - rounded square background gradient
+  - central crop square with 2x1 split grid lines
+  This is released into the repository under the project's existing license.
+-->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" width="1024" height="1024" role="img" aria-label="Crop and Split">
+  <defs>
+    <linearGradient id="bg" x1="0" x2="1" y1="0" y2="1">
+      <stop offset="0%" stop-color="#3a7bd5"/>
+      <stop offset="100%" stop-color="#00d2ff"/>
+    </linearGradient>
+    <filter id="shadow" x="-50%" y="-50%" width="200%" height="200%">
+      <feDropShadow dx="0" dy="18" stdDeviation="30" flood-color="#000" flood-opacity="0.25"/>
+    </filter>
+  </defs>
+
+  <!-- rounded background -->
+  <rect x="64" y="64" width="896" height="896" rx="180" ry="180" fill="url(#bg)"/>
+
+  <!-- subtle inner panel -->
+  <rect x="136" y="136" width="752" height="752" rx="120" ry="120" fill="rgba(255,255,255,0.06)" />
+
+  <!-- white rounded crop square with shadow -->
+  <g transform="translate(192,192)" filter="url(#shadow)">
+    <rect x="128" y="96" width="576" height="576" rx="28" ry="28" fill="#ffffff"/>
+    <!-- crop border -->
+    <rect x="128" y="96" width="576" height="576" rx="28" ry="28" fill="none" stroke="#2b2b2b" stroke-opacity="0.08" stroke-width="6"/>
+  </g>
+
+  <!-- split grid: 2 cols x 1 row over the crop area -->
+  <g transform="translate(320,288)">
+    <!-- divide into two columns -->
+    <line x1="384" y1="0" x2="384" y2="576" stroke="#333" stroke-opacity="0.18" stroke-width="8" stroke-dasharray="12 8"/>
+    <!-- outer rounded stroke to hint selection -->
+    <rect x="0" y="0" width="768" height="576" rx="18" ry="18" fill="none" stroke="#111" stroke-opacity="0.06" stroke-width="6"/>
+  </g>
+
+  <!-- small crop-corner indicators -->
+  <g transform="translate(320,288)" stroke="#2b2b2b" stroke-width="14" stroke-linecap="round" stroke-linejoin="round" stroke-opacity="0.14">
+    <!-- top-left -->
+    <path d="M28 56 L28 28 L56 28" />
+    <!-- top-right -->
+    <path d="M740 28 L740 56 L712 28" />
+    <!-- bottom-left -->
+    <path d="M28 520 L56 520 L28 492" />
+    <!-- bottom-right -->
+    <path d="M740 520 L712 520 L740 492" />
+  </g>
+
+  <!-- subtle highlight to give depth -->
+  <ellipse cx="512" cy="180" rx="260" ry="60" fill="#ffffff" opacity="0.04" />
+
+</svg>
