@@ -18,12 +18,18 @@ struct ContentView: View {
 
     @State private var selectionCenter: CGPoint = .zero // image-pixel coords
     @State private var selectionSize: CGSize = .zero // image-pixel size for interactive resize
-
-    // presets moved to ControlsView
+    // 프리셋 목록: ContentView에서 중앙 관리합니다.
+    let presets: [Preset] = [
+        Preset(name: "Instagram Vertical (4:5)", ratio: CGSize(width: 4, height: 5), cols: 1, rows: 1),
+        Preset(name: "Instagram Square (1:1)", ratio: CGSize(width: 1, height: 1), cols: 1, rows: 1),
+        Preset(name: "Instagram Two Across (8:5)", ratio: CGSize(width: 8, height: 5), cols: 2, rows: 1),
+        Preset(name: "Instagram Three Across (12:5)", ratio: CGSize(width: 12, height: 5), cols: 3, rows: 1),
+        Preset(name: "Instagram Four Across (16:5)", ratio: CGSize(width: 16, height: 5), cols: 4, rows: 1)
+    ]
 
     var body: some View {
         VStack(alignment: .leading) {
-            ControlsView(cropWidthText: $cropWidthText, cropHeightText: $cropHeightText, lockAspect: $lockAspect, selectedPreset: $selectedPreset, cols: $cols, rows: $rows, imageSize: imageSize, loadImage: loadImage, applyPreset: applyPreset, cropAndSave: cropAndSave)
+            ControlsView(presets: presets, cropWidthText: $cropWidthText, cropHeightText: $cropHeightText, lockAspect: $lockAspect, selectedPreset: $selectedPreset, cols: $cols, rows: $rows, imageSize: imageSize, loadImage: loadImage, applyPreset: applyPreset, cropAndSave: cropAndSave)
 
             Divider()
 

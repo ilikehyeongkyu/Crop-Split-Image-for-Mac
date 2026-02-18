@@ -24,13 +24,8 @@ struct ControlsView: View {
     var applyPreset: (Preset) -> Void
     var cropAndSave: () -> Void
 
-    let presets: [Preset] = [
-        Preset(name: "Instagram Vertical (4:5)", ratio: CGSize(width: 4, height: 5), cols: 1, rows: 1),
-        Preset(name: "Instagram Square (1:1)", ratio: CGSize(width: 1, height: 1), cols: 1, rows: 1),
-        Preset(name: "Instagram Two Across (8:5)", ratio: CGSize(width: 8, height: 5), cols: 2, rows: 1),
-        Preset(name: "Instagram Three Across (12:5)", ratio: CGSize(width: 12, height: 5), cols: 3, rows: 1),
-        Preset(name: "Instagram Four Across (16:5)", ratio: CGSize(width: 16, height: 5), cols: 4, rows: 1)
-    ]
+    // 프리셋은 부모 뷰(ContentView)에서 전달됩니다.
+    let presets: [Preset]
 
     var body: some View {
         VStack(spacing: 8) {
@@ -101,7 +96,9 @@ struct ControlsView: View {
 #if DEBUG
 struct ControlsView_Previews: PreviewProvider {
     static var previews: some View {
-        ControlsView(cropWidthText: .constant("800"), cropHeightText: .constant("600"), lockAspect: .constant(false), selectedPreset: .constant(nil), cols: .constant(1), rows: .constant(1), imageSize: CGSize(width: 800, height: 600), loadImage: {}, applyPreset: { _ in }, cropAndSave: {})
+        ControlsView(presets: [
+            Preset(name: "Instagram Vertical (4:5)", ratio: CGSize(width: 4, height: 5), cols: 1, rows: 1)
+        ], cropWidthText: .constant("800"), cropHeightText: .constant("600"), lockAspect: .constant(false), selectedPreset: .constant(nil), cols: .constant(1), rows: .constant(1), imageSize: CGSize(width: 800, height: 600), loadImage: {}, applyPreset: { _ in }, cropAndSave: {})
     }
 }
 #endif
