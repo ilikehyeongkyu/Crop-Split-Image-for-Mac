@@ -21,6 +21,13 @@ else
   echo "tuist not found — skipping generate step"
 fi
 
+if [ -x "scripts/generate_app_icon.sh" ]; then
+  echo "Generating AppIcon.icns from SVG..."
+  ./scripts/generate_app_icon.sh
+else
+  echo "No icon generator script found; skipping icon generation"
+fi
+
 echo "Cleaning previous build..."
 rm -rf "$DERIVED_DATA"
 
