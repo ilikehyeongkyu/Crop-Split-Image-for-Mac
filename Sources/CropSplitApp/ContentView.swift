@@ -23,11 +23,11 @@ struct ContentView: View {
     @State private var selectionSize: CGSize = .zero // image-pixel size for interactive resize
 
     let presets: [Preset] = [
-        Preset(name: "인스타그램 세로 (4:5)", ratio: CGSize(width: 4, height: 5)),
-        Preset(name: "정사각형 (1:1)", ratio: CGSize(width: 1, height: 1)),
-        Preset(name: "가로로 두장 이어붙임 (8:5)", ratio: CGSize(width: 8, height: 5)),
-        Preset(name: "가로로 세장 이어붙임 (12:5)", ratio: CGSize(width: 12, height: 5)),
-        Preset(name: "가로로 네장 이어붙임 (16:5)", ratio: CGSize(width: 16, height: 5))
+        Preset(name: "Instagram Vertical (4:5)", ratio: CGSize(width: 4, height: 5)),
+        Preset(name: "Square (1:1)", ratio: CGSize(width: 1, height: 1)),
+        Preset(name: "Two Across (8:5)", ratio: CGSize(width: 8, height: 5)),
+        Preset(name: "Three Across (12:5)", ratio: CGSize(width: 12, height: 5)),
+        Preset(name: "Four Across (16:5)", ratio: CGSize(width: 16, height: 5))
     ]
 
     var body: some View {
@@ -35,42 +35,51 @@ struct ContentView: View {
             VStack(spacing: 8) {
                 HStack(spacing: 12) {
                     Button("Load Image") { loadImage() }
-                    Text("원본: \(Int(imageSize.width)) x \(Int(imageSize.height))")
+                    Text("Original: \(Int(imageSize.width)) x \(Int(imageSize.height))")
                         .frame(minWidth: 160, alignment: .leading)
                     HStack(spacing: 8) {
+                        Text("Crop Size:")
                         TextField("width", text: $cropWidthText)
                             .frame(width: 80)
                         Text("x")
                         TextField("height", text: $cropHeightText)
                             .frame(width: 80)
-                        Toggle("비율 고정", isOn: $lockAspect)
-                            .toggleStyle(.button)
+                        Toggle("Lock Aspect", isOn: $lockAspect)
+                            .toggleStyle(CheckboxToggleStyle())
                     }
                     Spacer()
                 }
-
+                
                 HStack(spacing: 12) {
                     HStack(spacing: 6) {
-                        Picker("프리셋", selection: Binding(get: { selectedPreset }, set: { new in
+                        Picker("Presets:", selection: Binding(get: { selectedPreset }, set: { new in
                             selectedPreset = new
                             if let p = new {
                                 lockAspect = true
                                 applyPreset(p)
                             }
                         })) {
-                            Text("없음").tag(Optional<Preset>.none)
+                            Text("None").tag(Optional<Preset>.none)
                             ForEach(presets) { p in
                                 Text(p.name).tag(Optional(p))
                             }
                         }
                         .pickerStyle(.menu)
                     }
-
+                    
                     Spacer()
-
-                    Stepper("가로: \(cols)", value: $cols, in: 1...10)
-                    Stepper("세로: \(rows)", value: $rows, in: 1...10)
+                }
+                
+                HStack(spacing: 8) {
+                    Text("Split:")
+                    Stepper("Cols: \(cols)", value: $cols, in: 1...10)
+                    Stepper("Rows: \(rows)", value: $rows, in: 1...10)
+                    Spacer()
+                }
+                
+                HStack(spacing: 12) {
                     Button("Crop & Save") { cropAndSave() }
+                    Spacer()
                 }
             }
             .padding()
@@ -115,7 +124,7 @@ struct ContentView: View {
                                 handleDrop(providers: providers)
                             }
                     } else {
-                        Text("이미지를 로드하세요.")
+                        Text("Load an image.")
                             .foregroundColor(.secondary)
                     }
                 }
