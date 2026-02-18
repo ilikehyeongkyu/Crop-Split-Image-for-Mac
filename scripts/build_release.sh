@@ -25,7 +25,12 @@ echo "Cleaning previous build..."
 rm -rf "$DERIVED_DATA"
 
 echo "Building scheme $SCHEME ($CONFIGURATION)"
-xcodebuild -scheme "$SCHEME" -configuration "$CONFIGURATION" -derivedDataPath "$DERIVED_DATA" clean build | xcbeautify || xtrue
+if command -v xcbeautify >/dev/null 2>&1; then
+  xcodebuild -scheme "$SCHEME" -configuration "$CONFIGURATION" -derivedDataPath "$DERIVED_DATA" clean build | xcbeautify
+else
+  echo "xcbeautify not found — running xcodebuild without formatting"
+  xcodebuild -scheme "$SCHEME" -configuration "$CONFIGURATION" -derivedDataPath "$DERIVED_DATA" clean build
+fi
 
 echo "Locating built .app..."
 APP_PATH=$(find "$DERIVED_DATA" -type d -name "${SCHEME}.app" -print -quit || true)
